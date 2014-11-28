@@ -32,17 +32,23 @@
             this.tbMessages = new System.Windows.Forms.TextBox();
             this.tbMessageToSend = new System.Windows.Forms.TextBox();
             this.btSend = new System.Windows.Forms.Button();
+            this.btConnect = new System.Windows.Forms.Button();
+            this.btUpdate = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
             // 
-            this.tableLayoutPanel1.ColumnCount = 2;
+            this.tableLayoutPanel1.ColumnCount = 4;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
             this.tableLayoutPanel1.Controls.Add(this.tbMessages, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.tbMessageToSend, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.btSend, 1, 2);
+            this.tableLayoutPanel1.Controls.Add(this.btSend, 3, 2);
+            this.tableLayoutPanel1.Controls.Add(this.btConnect, 1, 2);
+            this.tableLayoutPanel1.Controls.Add(this.btUpdate, 2, 2);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -55,7 +61,7 @@
             // 
             // tbMessages
             // 
-            this.tableLayoutPanel1.SetColumnSpan(this.tbMessages, 2);
+            this.tableLayoutPanel1.SetColumnSpan(this.tbMessages, 4);
             this.tbMessages.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbMessages.Location = new System.Drawing.Point(3, 3);
             this.tbMessages.Multiline = true;
@@ -65,7 +71,7 @@
             // 
             // tbMessageToSend
             // 
-            this.tableLayoutPanel1.SetColumnSpan(this.tbMessageToSend, 2);
+            this.tableLayoutPanel1.SetColumnSpan(this.tbMessageToSend, 4);
             this.tbMessageToSend.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tbMessageToSend.Location = new System.Drawing.Point(3, 174);
             this.tbMessageToSend.Multiline = true;
@@ -83,6 +89,28 @@
             this.btSend.Text = "Отправить";
             this.btSend.UseVisualStyleBackColor = true;
             this.btSend.Click += new System.EventHandler(this.btSend_Click);
+            // 
+            // btConnect
+            // 
+            this.btConnect.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btConnect.Location = new System.Drawing.Point(227, 234);
+            this.btConnect.Name = "btConnect";
+            this.btConnect.Size = new System.Drawing.Size(94, 24);
+            this.btConnect.TabIndex = 3;
+            this.btConnect.Text = "Подключиться";
+            this.btConnect.UseVisualStyleBackColor = true;
+            this.btConnect.Click += new System.EventHandler(this.btConnect_Click);
+            // 
+            // btUpdate
+            // 
+            this.btUpdate.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btUpdate.Location = new System.Drawing.Point(327, 234);
+            this.btUpdate.Name = "btUpdate";
+            this.btUpdate.Size = new System.Drawing.Size(94, 24);
+            this.btUpdate.TabIndex = 4;
+            this.btUpdate.Text = "Обновить";
+            this.btUpdate.UseVisualStyleBackColor = true;
+            this.btUpdate.Click += new System.EventHandler(this.btUpdate_Click);
             // 
             // FormClient
             // 
@@ -106,6 +134,8 @@
         private System.Windows.Forms.TextBox tbMessages;
         private System.Windows.Forms.TextBox tbMessageToSend;
         private System.Windows.Forms.Button btSend;
+        private System.Windows.Forms.Button btConnect;
+        private System.Windows.Forms.Button btUpdate;
     }
 }
 

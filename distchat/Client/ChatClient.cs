@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -10,59 +9,68 @@ namespace Client
     public class ChatClient
     {
         public EventHandler<MessageEventArgs> MessageReceived;
-        private readonly IPEndPoint clientEndPoint;
-        private readonly IPEndPoint serverEndPoint;
-        private readonly Socket socket;
-        private Thread listenThread;
-        private readonly object lockObject = true;
 
-        public ChatClient(IPEndPoint clientEndPoint, IPEndPoint serverEndPoint)
+        private readonly IPEndPoint serverEndPoint;
+        private readonly TcpClient client;
+        private NetworkStream stream;
+        private Thread listenThread;
+        private readonly string clientName;
+        private const string MSG_DELIMITER = "&&&";
+        private const string MSG_CONNECT = "%%connect%%";
+
+        public ChatClient(string clientName, IPEndPoint clientEndPoint, IPEndPoint serverEndPoint)
         {
-            this.clientEndPoint = clientEndPoint;
             this.serverEndPoint = serverEndPoint;
-            socket = new Socket(clientEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            this.clientName = clientName;
+            client = new TcpClient(clientEndPoint);
         }
 
         public void Initialize()
         {
-            socket.Bind(clientEndPoint);
-            listenThread = new Thread(ListenServer);
-            listenThread.Start();
+            client.Connect(serverEndPoint);
+            stream = client.GetStream();
+            Send(MSG_CONNECT);
+            //listenThread = new Thread(ListenServer);
+            //listenThread.Start();
         }
 
         public void Send(string message)
         {
-            var sendSocket = new Socket(socket.AddressFamily, socket.SocketType, socket.ProtocolType);
-            sendSocket.Bind(clientEndPoint);
-            byte[] data = Encoding.Unicode.GetBytes(message);
-            sendSocket.SendTo(data, serverEndPoint);
+            byte[] data = Encoding.Unicode.GetBytes(string.Format("{0}{1}{2}", clientName, MSG_DELIMITER, message));
+            stream.Write(data, 0, data.Length);
         }
 
         public void Deinitialize()
         {
-            listenThread.Abort();
+            if (listenThread != null)
+                listenThread.Abort();
+            client.Close();
         }
 
         private void ListenServer()
         {
-            socket.Listen(10);
             while (true)
-            {
-                var server = socket.Accept();
-                if (!Equals(server.RemoteEndPoint, serverEndPoint))
-                    continue;
-                ProcessServerMessage(server);
-            }
+                Read();
         }
 
-        private void ProcessServerMessage(Socket server)
+        public void Read()
         {
-            var data = new byte[1024];
-            int msgLen = server.Receive(data);
-            data = data.ToList().GetRange(0, msgLen).ToArray();
-            string message = Encoding.Unicode.GetString(data);
-            string from = ((IPEndPoint) server.RemoteEndPoint).Address.ToString();
-            OnMessageReceived(new MessageEventArgs(from, message));
+            if (stream.CanRead && stream.DataAvailable)
+                ProcessServerMessage(stream);
+        }
+
+        private void ProcessServerMessage(NetworkStream stream)
+        {
+            var data = new byte[client.ReceiveBufferSize];
+            int dataLength = stream.Read(data, 0, client.ReceiveBufferSize);
+            if (dataLength > 0)
+            {
+                string[] messageObj = Encoding.Unicode.GetString(data)
+                    .Split(new[] {"&&&"}, StringSplitOptions.RemoveEmptyEntries);
+                string message = messageObj[1];
+                string from = messageObj[0];
+                OnMessageReceived(new MessageEventArgs(from, message));
+            }
         }
 
         private void OnMessageReceived(MessageEventArgs e)

@@ -25,25 +25,13 @@ namespace Client.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1")]
-        public string ClientHost {
+        [global::System.Configuration.DefaultSettingValueAttribute("User1")]
+        public string ClientName {
             get {
-                return ((string)(this["ClientHost"]));
+                return ((string)(this["ClientName"]));
             }
             set {
-                this["ClientHost"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2120")]
-        public int ClientPort {
-            get {
-                return ((int)(this["ClientPort"]));
-            }
-            set {
-                this["ClientPort"] = value;
+                this["ClientName"] = value;
             }
         }
         
@@ -61,13 +49,37 @@ namespace Client.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2131")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2130")]
         public int ServerPort {
             get {
                 return ((int)(this["ServerPort"]));
             }
             set {
                 this["ServerPort"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("127.0.0.1")]
+        public string ClientHost {
+            get {
+                return ((string)(this["ClientHost"]));
+            }
+            set {
+                this["ClientHost"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2131")]
+        public int ClientPort {
+            get {
+                return ((int)(this["ClientPort"]));
+            }
+            set {
+                this["ClientPort"] = value;
             }
         }
     }

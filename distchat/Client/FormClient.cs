@@ -15,23 +15,27 @@ namespace Client
 
         private void FormClient_Load(object sender, EventArgs e)
         {
-            chatClient.MessageReceived += MessageReceived;
-            chatClient.Initialize();
+            
         }
 
         private void MessageReceived(object sender, ChatClient.MessageEventArgs e)
         {
             try
             {
-                tbMessages.Invoke(new Action(() =>
-                {
-                    tbMessages.Text += string.Format("{0} - {1} : {2}", DateTime.Now, e.From, e.Message);
-                }));
+                if (InvokeRequired)
+                    Invoke(new Action<string, string>(WriteMessage), e.From, e.Message);
+                else
+                    WriteMessage(e.From, e.Message);
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Ошибка", ex.Message);
             }
+        }
+
+        private void WriteMessage(string from, string message)
+        {
+            tbMessages.Text += string.Format("{0} - {1} : {2}\r\n", DateTime.Now, from, message);
         }
 
         private void FormClient_FormClosed(object sender, FormClosedEventArgs e)
@@ -52,6 +56,31 @@ namespace Client
             {
                 if(!string.IsNullOrEmpty(tbMessageToSend.Text))
                     chatClient.Send(tbMessageToSend.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Ошибка", ex.Message);
+            }
+        }
+
+        private void btConnect_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                chatClient.MessageReceived += MessageReceived;
+                chatClient.Initialize();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Ошибка", ex.Message);
+            }
+        }
+
+        private void btUpdate_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                chatClient.Read();
             }
             catch (Exception ex)
             {
