@@ -3,18 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 
 namespace server
 {
     class DistChatServer
     {
         private readonly Socket listener;
-        private readonly List<IPEndPoint> clients;
-        private bool isStarted = false;
+        private TcpListener tcpListener;
+        private readonly List<Tuple<string, IPEndPoint>> clients;
+        private const string MSG_DELIMITER = "&&&";
+        private const string MSG_CONNECT = "%%connect%%";
 
         public DistChatServer(string host, int port)
         {
-            clients = new List<IPEndPoint>();
+            clients = new List<Tuple<string, IPEndPoint>>();
             IPAddress address = IPAddress.Parse(host);
             listener = new Socket(address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             listener.Bind(new IPEndPoint(address, port));
@@ -22,11 +25,11 @@ namespace server
 
         public void Start()
         {
-            isStarted = true;
-            Console.WriteLine("{0} - Server started at {1}", DateTime.Now,
-                ((IPEndPoint) listener.LocalEndPoint).Address);
+            Console.WriteLine("{0} - Server started at {1}:{2}", DateTime.Now,
+                ((IPEndPoint) listener.LocalEndPoint).Address,
+                ((IPEndPoint)listener.LocalEndPoint).Port);
             listener.Listen(10);
-            while (isStarted)
+            while (true)
             {
                 var client = listener.Accept();
                 ReceiveClientMessage(client);
@@ -35,23 +38,38 @@ namespace server
 
         private void ReceiveClientMessage(Socket client)
         {
-            var endPoint = (IPEndPoint)client.RemoteEndPoint;
-            if (!clients.Contains(endPoint))
-                clients.Add(endPoint);
             var data = new byte[1024];
             int msgLen = client.Receive(data);
-            data = data.ToList().GetRange(0, msgLen).ToArray();
-            Console.WriteLine("{0} - Message received from {1}", DateTime.Now, endPoint.Address);
-            SendMessage(endPoint, data);
+            if (msgLen > 0)
+            {
+                data = data.ToList().GetRange(0, msgLen).ToArray();
+                string[] msgObj = Encoding.Unicode.GetString(data)
+                    .Split(new[] {MSG_DELIMITER}, StringSplitOptions.RemoveEmptyEntries);
+                var endPoint = (IPEndPoint) client.RemoteEndPoint;
+                if (clients.All(c => c.Item1 != msgObj[0]))
+                    clients.Add(new Tuple<string, IPEndPoint>(msgObj[0], endPoint));
+                if (msgObj[1] == MSG_CONNECT)
+                {
+                    Console.WriteLine("{0} - Connected {1} [{2}:{3}]", DateTime.Now, msgObj[0], endPoint.Address,
+                        endPoint.Port);
+                }
+                else
+                {
+                    Console.WriteLine("{0} - Message received from {1} [{2}:{3}]", DateTime.Now, msgObj[0],
+                        endPoint.Address,
+                        endPoint.Port);
+                    SendMessage(endPoint, data);
+                }
+            }
         }
 
         private void SendMessage(IPEndPoint from, byte[] data)
         {
             foreach (var client in clients)
             {
-                if (client.Equals(from))
+                if (client.Item2.Equals(from))
                     continue;
-                SendMessageTo(client, data);
+                SendMessageTo(client.Item2, data);
             }
         }
 
